@@ -1,0 +1,8 @@
+streamlit
+google-generativeai
+youtube-transcript-api
+langchain
+langchain-google-genai
+langchain-community
+chromadb
+python-dotenv
