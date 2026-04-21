@@ -9,10 +9,16 @@ def get_transcript(youtube_url):
     video_id = youtube_url.split("v=")[1].split("&")[0]
     
     ytt_api = YouTubeTranscriptApi()
-    fetched_transcript = ytt_api.fetch(video_id)
+    
+    try:
+        fetched_transcript = ytt_api.fetch(video_id, languages=['en'])
+    except:
+        try:
+            fetched_transcript = ytt_api.fetch(video_id, languages=['hi'])
+        except:
+            fetched_transcript = ytt_api.fetch(video_id)
     
     full_transcript = " ".join([snippet.text for snippet in fetched_transcript])
-    
     return full_transcript
 
 ###print(get_transcript("https://www.youtube.com/watch?v=dQw4w9WgXcQ"))    
@@ -54,11 +60,12 @@ def generate_summary(transcript):
             {
                 "role": "user",
                 "content": f"""You are given the transcript of a YouTube video.
+                The transcript may be in Hindi, English, or both. Always respond in English.
                 Give me:
                 - A 5 line overall summary
                 - 5 to 7 key points from the video
                 - Any important terms or concepts mentioned
-                
+
                 Transcript:
                 {transcript[:20000]}"""
             }
@@ -86,12 +93,13 @@ def answer_question(question, chunks, embeddings):
         messages=[
             {
                 "role": "user",
-                "content": f"""Answer the question using ONLY the context below.
+                "content": f"""Answer the question in English using ONLY the context below.
+                The context may be in Hindi or English.
                 If the answer is not in the context, say "I couldn't find that in the video."
-                
+
                 Context:
                 {context}
-                
+
                 Question: {question}"""
             }
         ]
