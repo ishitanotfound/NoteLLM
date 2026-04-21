@@ -1,6 +1,6 @@
 # 🎥 AI-Powered YouTube Video Summarizer & Notes Generator 
 
-An AI-powered YouTube video summarization system using LLMs, generating structured notes and enabling question-answering via retrieval-based methods
+An AI-powered YouTube video summarization system using LLMs, generating structured notes and enabling question-answering via retrieval-based RAG pipeline with semantic search methods 
 
 ## Features
 - Paste any YouTube URL and get a summary instantly
