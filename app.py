@@ -26,11 +26,13 @@ def get_transcript(youtube_url):
     full_transcript = " ".join([snippet.text for snippet in fetched_transcript])
     return full_transcript
 
+import requests
+
 def get_video_metadata(video_id):
-    youtube = build('youtube', 'v3', developerKey=os.getenv("YOUTUBE_API_KEY"))
-    request = youtube.videos().list(part="snippet", id=video_id)
-    response = request.execute()
-    video = response['items'][0]['snippet']
+    url = f"https://www.googleapis.com/youtube/v3/videos?part=snippet&id={video_id}&key={os.getenv('YOUTUBE_API_KEY')}"
+    response = requests.get(url)
+    data = response.json()
+    video = data['items'][0]['snippet']
     return {
         "title": video['title'],
         "description": video['description'],
