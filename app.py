@@ -32,6 +32,12 @@ def get_video_metadata(video_id):
     url = f"https://www.googleapis.com/youtube/v3/videos?part=snippet&id={video_id}&key={os.getenv('YOUTUBE_API_KEY')}"
     response = requests.get(url)
     data = response.json()
+    
+    # temporary debug
+    if not data.get('items'):
+        st.error(f"API Error: {data}")
+        st.stop()
+    
     video = data['items'][0]['snippet']
     return {
         "title": video['title'],
