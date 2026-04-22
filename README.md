@@ -19,6 +19,7 @@ An AI-powered app that takes any YouTube video link, generates structured notes 
 ---
 
 ## How It Works  
+
 YouTube URL  
 ↓  
 Fetch Transcript (youtube-transcript-api)  
