@@ -2,7 +2,6 @@ from youtube_transcript_api import YouTubeTranscriptApi
 import re
 import os
 from dotenv import load_dotenv
-from googleapiclient.discovery import build
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 import numpy as np
 from sentence_transformers import SentenceTransformer
@@ -30,22 +29,25 @@ import requests
 from bs4 import BeautifulSoup
 
 def get_video_metadata(video_id):
+    # Thumbnail directly from YouTube — no scraping needed
+    thumbnail = f"http://img.youtube.com/vi/{video_id}/0.jpg"
+    
+    # Scrape only title and channel
     url = f"https://www.youtube.com/watch?v={video_id}"
-    headers = {"User-Agent": "Mozilla/5.0"}
+    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"}
     response = requests.get(url, headers=headers)
     soup = BeautifulSoup(response.text, 'html.parser')
     
-    title = soup.find('meta', property='og:title')['content']
-    thumbnail = soup.find('meta', property='og:image')['content']
+    try:
+        title = soup.find('meta', property='og:title')['content']
+    except:
+        title = "Unknown Title"
     
-    # Try multiple ways to get channel name
-    channel = "Unknown Channel"
     try:
         channel_tag = soup.find('link', itemprop='name')
-        if channel_tag:
-            channel = channel_tag['content']
+        channel = channel_tag['content'] if channel_tag else "Unknown Channel"
     except:
-        pass
+        channel = "Unknown Channel"
     
     return {
         "title": title,
@@ -112,6 +114,32 @@ def answer_question(question, chunks, embeddings):
     )
     return response.choices[0].message.content
 
+from reportlab.lib.pagesizes import A4
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.units import inch
+import io
+
+def generate_pdf(summary, title="Video Summary"):
+    buffer = io.BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=A4)
+    styles = getSampleStyleSheet()
+    story = []
+    
+    # Title
+    story.append(Paragraph(title, styles['Title']))
+    story.append(Spacer(1, 0.3*inch))
+    
+    # Summary content
+    for line in summary.split('\n'):
+        if line.strip():
+            story.append(Paragraph(line, styles['Normal']))
+            story.append(Spacer(1, 0.1*inch))
+    
+    doc.build(story)
+    buffer.seek(0)
+    return buffer
+
 # --- Streamlit UI ---
 st.set_page_config(page_title="Video Summarizer", page_icon="🎥")
 st.title("🎥 YouTube Video Summarizer")
@@ -120,6 +148,9 @@ st.write("Paste any YouTube link — get a summary and ask questions about it")
 url = st.text_input("YouTube URL")
 
 if st.button("Analyze Video"):
+    if not url.strip():
+        st.warning("⚠️ Please enter a YouTube URL first!")
+        st.stop()
     
     with st.spinner("Fetching video info..."):
         video_id = url.split("v=")[1].split("&")[0]
@@ -146,6 +177,8 @@ if st.button("Analyze Video"):
     st.session_state.chunks = chunks
     st.session_state.embeddings = embeddings
     st.session_state.analyzed = True
+    st.session_state.summary = summary
+    st.session_state.video_title = metadata['title']
 
     st.subheader("📝 Summary")
     st.write(summary)
@@ -162,3 +195,16 @@ if st.session_state.get("analyzed"):
                 st.session_state.embeddings
             )
         st.write(answer)
+
+# --- Download Summary as PDF ---
+if st.session_state.get("analyzed"):
+    pdf_buffer = generate_pdf(
+        st.session_state.get("summary", ""),
+        title=st.session_state.get("video_title", "Video Summary")
+    )
+    st.download_button(
+        label="📥 Download Summary as PDF",
+        data=pdf_buffer,
+        file_name="summary.pdf",
+        mime="application/pdf"
+    )
