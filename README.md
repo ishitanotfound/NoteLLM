@@ -79,7 +79,7 @@ streamlit run app.py
 
 ---
 
-### Project Structure
+## Project Structure
 video-summarizer/
 ├── app.py
 ├── requirements.txt
@@ -90,7 +90,7 @@ video-summarizer/
 │   └── screenshot2.png
 |   └── screenshot3.png
 └── README.md
----
+
 
 ## Future Improvements
 - Support for videos without captions using Whisper (speech-to-text)
