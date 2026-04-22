@@ -19,19 +19,19 @@ An AI-powered app that takes any YouTube video link, generates structured notes 
 ---
 
 ## How It Works
-YouTube URL
-↓
-Fetch Transcript (youtube-transcript-api)
-↓
-Chunk Text (LangChain Text Splitter)
-↓
-Vectorize Chunks (Sentence Transformers)
-↓
-Store Vectors (Numpy)
-↓
-Generate Summary (Groq - LLaMA 3.3 70B)
-↓
-Q&A via Semantic Search + Groq
+YouTube URL  
+↓  
+Fetch Transcript (youtube-transcript-api)  
+↓  
+Chunk Text (LangChain Text Splitter)  
+↓  
+Vectorize Chunks (Sentence Transformers)  
+↓  
+Store Vectors (Numpy)  
+↓  
+Generate Summary (Groq - LLaMA 3.3 70B)  
+↓  
+Q&A via Semantic Search + Groq  
 ---
 
 ## Screenshots
@@ -80,16 +80,16 @@ streamlit run app.py
 ---
 
 ## Project Structure
-video-summarizer/
-├── app.py
-├── requirements.txt
-├── .env
-├── .gitignore
-├── assets/
-│   ├── screenshot1.png
-│   └── screenshot2.png
-|   └── screenshot3.png
-└── README.md
+video-summarizer/  
+├── app.py  
+├── requirements.txt  
+├── .env  
+├── .gitignore  
+├── assets/  
+│   ├── screenshot1.png  
+│   └── screenshot2.png  
+|   └── screenshot3.png  
+└── README.md  
 
 
 ## Future Improvements
