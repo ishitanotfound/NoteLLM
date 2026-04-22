@@ -79,7 +79,7 @@ streamlit run app.py
 
 ---
 
-## Project Structure
+### Project Structure
 video-summarizer/
 ├── app.py
 ├── requirements.txt
