@@ -27,23 +27,30 @@ def get_transcript(youtube_url):
     return full_transcript
 
 import requests
+from bs4 import BeautifulSoup
 
 def get_video_metadata(video_id):
-    url = f"https://www.googleapis.com/youtube/v3/videos?part=snippet&id={video_id}&key={os.getenv('YOUTUBE_API_KEY')}"
-    response = requests.get(url)
-    data = response.json()
+    url = f"https://www.youtube.com/watch?v={video_id}"
+    headers = {"User-Agent": "Mozilla/5.0"}
+    response = requests.get(url, headers=headers)
+    soup = BeautifulSoup(response.text, 'html.parser')
     
-    # temporary debug
-    if not data.get('items'):
-        st.error(f"API Error: {data}")
-        st.stop()
+    title = soup.find('meta', property='og:title')['content']
+    thumbnail = soup.find('meta', property='og:image')['content']
     
-    video = data['items'][0]['snippet']
+    # Try multiple ways to get channel name
+    channel = "Unknown Channel"
+    try:
+        channel_tag = soup.find('link', itemprop='name')
+        if channel_tag:
+            channel = channel_tag['content']
+    except:
+        pass
+    
     return {
-        "title": video['title'],
-        "description": video['description'],
-        "thumbnail": video['thumbnails']['high']['url'],
-        "channel": video['channelTitle']
+        "title": title,
+        "thumbnail": thumbnail,
+        "channel": channel
     }
 
 def chunk_transcript(transcript):
